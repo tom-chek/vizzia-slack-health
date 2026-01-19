@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vizzia Slack Health</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f1a;
+            color: #e5e5e5;
+            min-height: 100vh;
+            padding: 40px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 32px; }
+        
+        /* Top Section */
+        .top-section {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        /* Star Rating Card */
+        .rating-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 24px 28px;
+            min-width: 220px;
+        }
+        .rating-label {
+            font-size: 0.7rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .stars {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+        .star {
+            font-size: 1.5rem;
+            color: #2a2a3e;
+        }
+        .star.filled { color: #eab308; }
+        .star.half { 
+            background: linear-gradient(90deg, #eab308 50%, #2a2a3e 50%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .health-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .health-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        .health-emoji {
+            font-size: 0.65rem;
+        }
+        
+        /* Insights Card */
+        .insights-card {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 24px;
+        }
+        .insights-title {
+            font-size: 0.7rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .insight-item:last-child { margin-bottom: 0; }
+        .insight-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            background: rgba(139,92,246,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .insight-text {
+            font-size: 0.82rem;
+            color: #999;
+            line-height: 1.45;
+        }
+        .insight-text strong { color: #ddd; }
+        .insight-text .highlight { color: #a78bfa; }
+        
+        /* Actions Section */
+        .section-title {
+            font-size: 0.7rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .actions {
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        .action-item {
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .action-item:last-child { border-bottom: none; }
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .action-header:hover { background: rgba(255,255,255,0.025); }
+        .action-left { display: flex; align-items: center; gap: 12px; }
+        .action-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .action-dot.critical { background: #ef4444; }
+        .action-dot.warning { background: #eab308; }
+        .action-dot.low { background: #555; }
+        .action-name { font-size: 0.85rem; color: #ccc; }
+        .action-right { display: flex; align-items: center; gap: 14px; }
+        .action-stat {
+            font-size: 0.75rem;
+            color: #555;
+        }
+        .action-chevron {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: rgba(139,92,246,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .action-chevron svg {
+            width: 12px;
+            height: 12px;
+            stroke: #8b5cf6;
+            transition: transform 0.2s;
+        }
+        .action-header:hover .action-chevron {
+            background: rgba(139,92,246,0.2);
+        }
+        .action-item.open .action-chevron svg {
+            transform: rotate(180deg);
+        }
+        
+        .action-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+        }
+        .action-item.open .action-content { max-height: 700px; }
+        .action-body {
+            padding: 12px 20px 20px 38px;
+            font-size: 0.8rem;
+            color: #777;
+            line-height: 1.6;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+        .action-body p { margin-bottom: 10px; }
+        .action-body p:last-child { margin-bottom: 0; }
+        .action-body strong { color: #999; }
+        
+        .prefixes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .prefix {
+            background: rgba(139,92,246,0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: monospace;
+            color: #a78bfa;
+        }
+        
+        .channel-list {
+            max-height: 160px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            font-size: 0.7rem;
+            font-family: monospace;
+        }
+        .channel-list::-webkit-scrollbar { width: 4px; }
+        .channel-list::-webkit-scrollbar-track { background: transparent; }
+        .channel-list::-webkit-scrollbar-thumb { background: #2a2a3e; border-radius: 2px; }
+        .channel-list div {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            justify-content: space-between;
+        }
+        .channel-list div:last-child { border-bottom: none; }
+        .channel-list .days { color: #444; }
+        .channel-list .ghost { color: #ef4444; }
+        .list-label {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 14px;
+            margin-bottom: 8px;
+        }
+        .list-label:first-of-type { margin-top: 4px; }
+        
+        /* Best Practices */
+        .practices-emphasis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .practices-secondary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .practice {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 14px 16px;
+            transition: all 0.2s;
+        }
+        .practice:hover {
+            background: rgba(255,255,255,0.035);
+            border-color: rgba(255,255,255,0.08);
+        }
+        .practice.emphasis {
+            background: rgba(139,92,246,0.08);
+            border: 1px solid rgba(139,92,246,0.2);
+            padding: 20px 22px;
+        }
+        .practice.emphasis:hover {
+            background: rgba(139,92,246,0.12);
+            border-color: rgba(139,92,246,0.3);
+        }
+        .practice-icon {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        .practice.emphasis .practice-icon {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        .practice-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #bbb;
+            margin-bottom: 4px;
+        }
+        .practice.emphasis .practice-title {
+            font-size: 0.95rem;
+            color: #e5e5e5;
+            margin-bottom: 6px;
+        }
+        .practice-desc {
+            font-size: 0.72rem;
+            color: #555;
+            line-height: 1.4;
+        }
+        .practice.emphasis .practice-desc {
+            font-size: 0.8rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vizzia Slack Health</h1>
+        
+        <!-- Top Section -->
+        <div class="top-section">
+            <div class="rating-card">
+                <div class="rating-label">Workspace Health</div>
+                <div class="stars">
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star half">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                </div>
+                <div class="health-items">
+                    <div class="health-item">
+                        <span class="health-emoji">🔴</span>
+                        <span>Public messages</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-emoji">🟡</span>
+                        <span>Active channels</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-emoji">🟡</span>
+                        <span>Naming standards</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-emoji">⚫</span>
+                        <span>Descriptions</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insights-card">
+                <div class="insights-title">Key Insights</div>
+                <div class="insight-item">
+                    <div class="insight-icon">📊</div>
+                    <div class="insight-text"><strong>76.5% of messages are in DMs</strong> — knowledge trapped in private conversations</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">📈</div>
+                    <div class="insight-text"><strong>130 channels created in 2025</strong> — 62% of all channels, rapid clutter growth</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">❤️</div>
+                    <div class="insight-text"><strong>Léa Hennequart</strong> leads with <span class="highlight">5,525 reactions</span> — <span class="highlight">11×</span> the average</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions (ordered by severity) -->
+        <div class="section-title">Actions</div>
+        <div class="actions">
+            
+            <!-- 1. Biggest issue: Public messages -->
+            <div class="action-item">
+                <div class="action-header" onclick="toggle(this)">
+                    <div class="action-left">
+                        <div class="action-dot critical"></div>
+                        <span class="action-name">Move conversations to channels</span>
+                    </div>
+                    <div class="action-right">
+                        <div class="action-stat">High impact</div>
+                        <div class="action-chevron">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-content">
+                    <div class="action-body">
+                        <p><strong>Why:</strong> DMs trap knowledge. New hires can't search for answers, and decisions disappear when people leave.</p>
+                        <p><strong>Do:</strong> Before DMing, ask "Could this help someone else?" If yes, post in a channel.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. Active channels -->
+            <div class="action-item">
+                <div class="action-header" onclick="toggle(this)">
+                    <div class="action-left">
+                        <div class="action-dot warning"></div>
+                        <span class="action-name">Archive dead channels</span>
+                    </div>
+                    <div class="action-right">
+                        <div class="action-stat">55 channels</div>
+                        <div class="action-chevron">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-content">
+                    <div class="action-body">
+                        <p><strong>Why:</strong> Dead channels create confusion. People hesitate to post, then retreat to DMs.</p>
+                        
+                        <div class="list-label">🚫 Ghost channels — 0 messages ever</div>
+                        <div class="channel-list">
+                            <div><span class="ghost">#abm-marketing</span></div>
+                            <div><span class="ghost">#alternants</span></div>
+                            <div><span class="ghost">#camera-system</span></div>
+                            <div><span class="ghost">#detector1</span></div>
+                            <div><span class="ghost">#detector2</span></div>
+                            <div><span class="ghost">#eic</span></div>
+                            <div><span class="ghost">#electronics-external</span></div>
+                            <div><span class="ghost">#gestion-grosses-batteries</span></div>
+                            <div><span class="ghost">#grimaud-renew-upsell</span></div>
+                            <div><span class="ghost">#install-st-tropez</span></div>
+                            <div><span class="ghost">#ivizzia-improvements</span></div>
+                            <div><span class="ghost">#orga-salons</span></div>
+                            <div><span class="ghost">#run-hubspot</span></div>
+                            <div><span class="ghost">#sentinel-incident-manager</span></div>
+                            <div><span class="ghost">#software-operation-notif</span></div>
+                            <div><span class="ghost">#test-app_automation</span></div>
+                            <div><span class="ghost">#v4-pcb</span></div>
+                            <div><span class="ghost">#web-dev</span></div>
+                        </div>
+                        
+                        <div class="list-label">💀 Dead channels — 90+ days inactive</div>
+                        <div class="channel-list">
+                            <div><span>#onboarding-project</span><span class="days">593d</span></div>
+                            <div><span>#v4_2-improvements</span><span class="days">446d</span></div>
+                            <div><span>#fabrication</span><span class="days">396d</span></div>
+                            <div><span>#sales-compta-signaturedevis</span><span class="days">354d</span></div>
+                            <div><span>#amendes</span><span class="days">302d</span></div>
+                            <div><span>#installations-v4</span><span class="days">285d</span></div>
+                            <div><span>#testautomatisation</span><span class="days">279d</span></div>
+                            <div><span>#saint-etienne</span><span class="days">269d</span></div>
+                            <div><span>#temporaire-aytré</span><span class="days">247d</span></div>
+                            <div><span>#demande-pref</span><span class="days">245d</span></div>
+                            <div><span>#csm-0churn-upsell</span><span class="days">243d</span></div>
+                            <div><span>#condom</span><span class="days">240d</span></div>
+                            <div><span>#projet-ccvam</span><span class="days">226d</span></div>
+                            <div><span>#gabin-webdesign</span><span class="days">223d</span></div>
+                            <div><span>#proj-proposition-amélioration</span><span class="days">218d</span></div>
+                            <div><span>#choisy-le-roi</span><span class="days">214d</span></div>
+                            <div><span>#réglementation-csu-fr</span><span class="days">211d</span></div>
+                            <div><span>#installation-draveil</span><span class="days">211d</span></div>
+                            <div><span>#reglages-cameras</span><span class="days">202d</span></div>
+                            <div><span>#media-labeling-testing</span><span class="days">199d</span></div>
+                            <div><span>#avignon-panneau-solaire</span><span class="days">197d</span></div>
+                            <div><span>#projet-vernon</span><span class="days">197d</span></div>
+                            <div><span>#résolution-incidents</span><span class="days">193d</span></div>
+                            <div><span>#new-client</span><span class="days">191d</span></div>
+                            <div><span>#depart-fx</span><span class="days">186d</span></div>
+                            <div><span>#website-updates-2025</span><span class="days">186d</span></div>
+                            <div><span>#temporaire-poc-panneaux-solaires</span><span class="days">184d</span></div>
+                            <div><span>#anagram-vizzia</span><span class="days">159d</span></div>
+                            <div><span>#notion-sales-and-onboarding</span><span class="days">157d</span></div>
+                            <div><span>#recyclage-batteries</span><span class="days">150d</span></div>
+                            <div><span>#packaging</span><span class="days">145d</span></div>
+                            <div><span>#sète</span><span class="days">106d</span></div>
+                            <div><span>#aytré</span><span class="days">102d</span></div>
+                            <div><span>#marketing</span><span class="days">102d</span></div>
+                            <div><span>#installations-réparations</span><span class="days">100d</span></div>
+                            <div><span>#new-installation</span><span class="days">96d</span></div>
+                            <div><span>#retool-apps</span><span class="days">93d</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3. Naming standards -->
+            <div class="action-item">
+                <div class="action-header" onclick="toggle(this)">
+                    <div class="action-left">
+                        <div class="action-dot warning"></div>
+                        <span class="action-name">Standardize channel names</span>
+                    </div>
+                    <div class="action-right">
+                        <div class="action-stat">45 channels</div>
+                        <div class="action-chevron">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-content">
+                    <div class="action-body">
+                        <p><strong>Why:</strong> Without prefixes, you can't browse by category or spot temporary channels.</p>
+                        <p><strong>Required prefixes:</strong></p>
+                        <div class="prefixes">
+                            <span class="prefix">team-</span>
+                            <span class="prefix">proj-</span>
+                            <span class="prefix">help-</span>
+                            <span class="prefix">alert-</span>
+                            <span class="prefix">social-</span>
+                            <span class="prefix">ext-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4. Lowest priority: Descriptions -->
+            <div class="action-item">
+                <div class="action-header" onclick="toggle(this)">
+                    <div class="action-left">
+                        <div class="action-dot low"></div>
+                        <span class="action-name">Add channel descriptions</span>
+                    </div>
+                    <div class="action-right">
+                        <div class="action-stat">184 missing</div>
+                        <div class="action-chevron">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-content">
+                    <div class="action-body">
+                        <p><strong>Why:</strong> New hires can't understand what channels are for without descriptions.</p>
+                        <p><strong>Do:</strong> Each description should answer: <strong>What</strong> (purpose), <strong>Who</strong> (audience), <strong>When</strong> (response time).</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Best Practices -->
+        <div class="section-title">Best Practices</div>
+        
+        <!-- 2 Emphasized -->
+        <div class="practices-emphasis">
+            <div class="practice emphasis">
+                <div class="practice-icon">🧵</div>
+                <div class="practice-title">Reply in threads</div>
+                <div class="practice-desc">Keeps main channel readable and easy to follow at scale</div>
+            </div>
+            <div class="practice emphasis">
+                <div class="practice-icon">👍</div>
+                <div class="practice-title">React, don't reply</div>
+                <div class="practice-desc">Emoji reactions reduce noise by 60% — use them liberally</div>
+            </div>
+        </div>
+        
+        <!-- 4 Secondary -->
+        <div class="practices-secondary">
+            <div class="practice">
+                <div class="practice-icon">📅</div>
+                <div class="practice-title">Connect Calendar</div>
+                <div class="practice-desc">Auto-sets meeting status</div>
+            </div>
+            <div class="practice">
+                <div class="practice-icon">💬</div>
+                <div class="practice-title">Default to channels</div>
+                <div class="practice-desc">DMs for private only</div>
+            </div>
+            <div class="practice">
+                <div class="practice-icon">🔕</div>
+                <div class="practice-title">@channel sparingly</div>
+                <div class="practice-desc">Emergencies only</div>
+            </div>
+            <div class="practice">
+                <div class="practice-icon">📌</div>
+                <div class="practice-title">Pin key messages</div>
+                <div class="practice-desc">Decisions & links</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggle(el) {
+            el.closest('.action-item').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
