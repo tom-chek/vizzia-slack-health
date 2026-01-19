@@ -144,13 +144,34 @@
             border-radius: 50%;
         }
         .action-dot.critical { background: #ef4444; }
-        .action-dot.warning { background: #eab308; }
+        .action-dot.warning { background: #f97316; }
+        .action-dot.caution { background: #eab308; }
         .action-dot.low { background: #555; }
         .action-name { font-size: 0.85rem; color: #ccc; }
         .action-right { display: flex; align-items: center; gap: 14px; }
         .action-stat {
-            font-size: 0.75rem;
-            color: #555;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: rgba(239,68,68,0.15);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+        .action-stat.warning {
+            background: rgba(249,115,22,0.15);
+            color: #fb923c;
+            border-color: rgba(249,115,22,0.25);
+        }
+        .action-stat.caution {
+            background: rgba(234,179,8,0.15);
+            color: #facc15;
+            border-color: rgba(234,179,8,0.25);
+        }
+        .action-stat.low {
+            background: rgba(255,255,255,0.05);
+            color: #888;
+            border-color: rgba(255,255,255,0.08);
         }
         .action-chevron {
             width: 24px;
@@ -353,7 +374,7 @@
                         <span>Public messages</span>
                     </div>
                     <div class="health-item">
-                        <span class="health-emoji">🟡</span>
+                        <span class="health-emoji">🟠</span>
                         <span>Active channels</span>
                     </div>
                     <div class="health-item">
@@ -361,7 +382,7 @@
                         <span>Naming standards</span>
                     </div>
                     <div class="health-item">
-                        <span class="health-emoji">⚫</span>
+                        <span class="health-emoji">🟡</span>
                         <span>Descriptions</span>
                     </div>
                 </div>
@@ -424,7 +445,7 @@
                         <span class="action-name">Archive dead channels</span>
                     </div>
                     <div class="action-right">
-                        <div class="action-stat">55 channels</div>
+                        <div class="action-stat warning">55 channels</div>
                         <div class="action-chevron">
                             <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -506,11 +527,11 @@
             <div class="action-item">
                 <div class="action-header" onclick="toggle(this)">
                     <div class="action-left">
-                        <div class="action-dot warning"></div>
+                        <div class="action-dot caution"></div>
                         <span class="action-name">Standardize channel names</span>
                     </div>
                     <div class="action-right">
-                        <div class="action-stat">45 channels</div>
+                        <div class="action-stat caution">45 channels</div>
                         <div class="action-chevron">
                             <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -538,11 +559,11 @@
             <div class="action-item">
                 <div class="action-header" onclick="toggle(this)">
                     <div class="action-left">
-                        <div class="action-dot low"></div>
+                        <div class="action-dot caution"></div>
                         <span class="action-name">Add channel descriptions</span>
                     </div>
                     <div class="action-right">
-                        <div class="action-stat">184 missing</div>
+                        <div class="action-stat low">184 missing</div>
                         <div class="action-chevron">
                             <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
