@@ -248,6 +248,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
+            margin-bottom: 32px;
         }
         .practice {
             background: rgba(255,255,255,0.02);
@@ -297,6 +298,38 @@
             font-size: 0.8rem;
             color: #888;
         }
+        
+        /* Resources */
+        .resources {
+            display: flex;
+            gap: 12px;
+        }
+        .resource-link {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .resource-link:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(139,92,246,0.3);
+        }
+        .resource-icon {
+            font-size: 1.1rem;
+        }
+        .resource-text {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        .resource-link:hover .resource-text {
+            color: #bbb;
+        }
     </style>
 </head>
 <body>
@@ -339,6 +372,10 @@
                 <div class="insight-item">
                     <div class="insight-icon">📊</div>
                     <div class="insight-text"><strong>76.5% of messages are in DMs</strong> — knowledge trapped in private conversations</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">🧵</div>
+                    <div class="insight-text"><strong>Only 35.5% of messages use threads</strong> — 64.5% clutter the main channel</div>
                 </div>
                 <div class="insight-item">
                     <div class="insight-icon">📈</div>
@@ -562,6 +599,19 @@
                 <div class="practice-title">Pin key messages</div>
                 <div class="practice-desc">Decisions & links</div>
             </div>
+        </div>
+        
+        <!-- Resources -->
+        <div class="section-title">Resources</div>
+        <div class="resources">
+            <a href="https://www.notion.so/vizzia/How-to-become-a-Slack-Hero-2e745c4b899e80bc904bd1880cebc5d6" target="_blank" class="resource-link">
+                <span class="resource-icon">📘</span>
+                <span class="resource-text">How to become a Slack Hero</span>
+            </a>
+            <a href="https://www.notion.so/vizzia/How-to-name-a-new-Slack-channel-2e745c4b899e80038d67d93760f29717" target="_blank" class="resource-link">
+                <span class="resource-icon">📝</span>
+                <span class="resource-text">How to name a new Slack channel</span>
+            </a>
         </div>
     </div>
     
