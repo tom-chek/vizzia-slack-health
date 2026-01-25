@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vizzia Slack Health · Jan 2026</title>
+    <title>Vizzia Workspace Health · Jan 2026</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -14,7 +14,45 @@
             padding: 40px;
         }
         .container { max-width: 1100px; margin: 0 auto; }
-        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 32px; }
+        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 24px; }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .tab:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.12);
+        }
+        .tab.active {
+            background: rgba(139,92,246,0.15);
+            border-color: rgba(139,92,246,0.4);
+            color: #e5e5e5;
+        }
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
         
         /* Top Section */
         .top-section {
@@ -250,6 +288,7 @@
         .channel-list div:last-child { border-bottom: none; }
         .channel-list .days { color: #444; }
         .channel-list .ghost { color: #ef4444; }
+        .channel-list .count { color: #666; }
         .list-label {
             font-size: 0.7rem;
             color: #666;
@@ -355,290 +394,480 @@
 </head>
 <body>
     <div class="container">
-        <h1>Vizzia Slack Health · Jan 2026</h1>
+        <h1>Vizzia Workspace Health · Jan 2026</h1>
         
-        <!-- Top Section -->
-        <div class="top-section">
-            <div class="rating-card">
-                <div class="rating-label">Workspace Health</div>
-                <div class="stars">
-                    <span class="star filled">★</span>
-                    <span class="star filled">★</span>
-                    <span class="star half">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                </div>
-                <div class="health-items">
-                    <div class="health-item">
-                        <span class="health-emoji">🔴</span>
-                        <span>DM-centered culture</span>
-                    </div>
-                    <div class="health-item">
-                        <span class="health-emoji">🟠</span>
-                        <span>Dead channels</span>
-                    </div>
-                    <div class="health-item">
-                        <span class="health-emoji">🟡</span>
-                        <span>Channel naming</span>
-                    </div>
-                    <div class="health-item">
-                        <span class="health-emoji">🟡</span>
-                        <span>Channel descriptions</span>
-                    </div>
-                </div>
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('slack')">
+                <span class="tab-icon">💬</span>
+                <span>Slack</span>
             </div>
-            
-            <div class="insights-card">
-                <div class="insights-title">Key Insights</div>
-                <div class="insight-item">
-                    <div class="insight-icon">📊</div>
-                    <div class="insight-text"><strong>76.5% of messages are in DMs</strong> — knowledge trapped in private conversations</div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon">🧵</div>
-                    <div class="insight-text"><strong>Only 35.5% of messages use threads</strong> — 64.5% clutter the main channel</div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon">📈</div>
-                    <div class="insight-text"><strong>130 channels created in 2025</strong> — 62% of all channels, rapid clutter growth</div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon">❤️</div>
-                    <div class="insight-text"><strong>Léa Hennequart</strong> leads with <span class="highlight">5,525 reactions</span> — <span class="highlight">11×</span> the average</div>
-                </div>
+            <div class="tab" onclick="switchTab('notion')">
+                <span class="tab-icon">📝</span>
+                <span>Notion</span>
             </div>
         </div>
         
-        <!-- Actions (ordered by severity) -->
-        <div class="section-title">Actions</div>
-        <div class="actions">
-            
-            <!-- 1. Biggest issue: Public messages -->
-            <div class="action-item">
-                <div class="action-header" onclick="toggle(this)">
-                    <div class="action-left">
-                        <div class="action-dot critical"></div>
-                        <span class="action-name">Move conversations to channels</span>
+        <!-- SLACK TAB -->
+        <div id="slack-tab" class="tab-content active">
+            <!-- Top Section -->
+            <div class="top-section">
+                <div class="rating-card">
+                    <div class="rating-label">Workspace Health</div>
+                    <div class="stars">
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star half">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
                     </div>
-                    <div class="action-right">
-                        <div class="action-stat">High impact</div>
-                        <div class="action-chevron">
-                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
+                    <div class="health-items">
+                        <div class="health-item">
+                            <span class="health-emoji">🔴</span>
+                            <span>DM-centered culture</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-emoji">🟠</span>
+                            <span>Dead channels</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-emoji">🟡</span>
+                            <span>Channel naming</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-emoji">🟡</span>
+                            <span>Channel descriptions</span>
                         </div>
                     </div>
                 </div>
-                <div class="action-content">
-                    <div class="action-body">
-                        <p><strong>Why:</strong> DMs trap knowledge. New hires can't search for answers, and decisions disappear when people leave.</p>
-                        <p><strong>Do:</strong> Before DMing, ask "Could this help someone else?" If yes, post in a channel.</p>
+                
+                <div class="insights-card">
+                    <div class="insights-title">Key Insights</div>
+                    <div class="insight-item">
+                        <div class="insight-icon">📊</div>
+                        <div class="insight-text"><strong>76.5% of messages are in DMs</strong> — knowledge trapped in private conversations</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">🧵</div>
+                        <div class="insight-text"><strong>Only 35.5% of messages use threads</strong> — 64.5% clutter the main channel</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">📈</div>
+                        <div class="insight-text"><strong>130 channels created in 2025</strong> — 62% of all channels, rapid clutter growth</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">❤️</div>
+                        <div class="insight-text"><strong>Léa Hennequart</strong> leads with <span class="highlight">5,525 reactions</span> — <span class="highlight">11×</span> the average</div>
                     </div>
                 </div>
             </div>
             
-            <!-- 2. Active channels -->
-            <div class="action-item">
-                <div class="action-header" onclick="toggle(this)">
-                    <div class="action-left">
-                        <div class="action-dot warning"></div>
-                        <span class="action-name">Archive dead channels</span>
+            <!-- Actions -->
+            <div class="section-title">Actions</div>
+            <div class="actions">
+                
+                <div class="action-item">
+                    <div class="action-header" onclick="toggle(this)">
+                        <div class="action-left">
+                            <div class="action-dot critical"></div>
+                            <span class="action-name">Move conversations to channels</span>
+                        </div>
+                        <div class="action-right">
+                            <div class="action-stat">High impact</div>
+                            <div class="action-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
-                    <div class="action-right">
-                        <div class="action-stat warning">55 channels</div>
-                        <div class="action-chevron">
-                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
+                    <div class="action-content">
+                        <div class="action-body">
+                            <p><strong>Why:</strong> DMs trap knowledge. New hires can't search for answers, and decisions disappear when people leave.</p>
+                            <p><strong>Do:</strong> Before DMing, ask "Could this help someone else?" If yes, post in a channel.</p>
                         </div>
                     </div>
                 </div>
-                <div class="action-content">
-                    <div class="action-body">
-                        <p><strong>Why:</strong> Dead channels create confusion. People hesitate to post, then retreat to DMs.</p>
-                        
-                        <div class="list-label">🚫 Ghost channels — 0 messages ever</div>
-                        <div class="channel-list">
-                            <div><span class="ghost">#abm-marketing</span></div>
-                            <div><span class="ghost">#alternants</span></div>
-                            <div><span class="ghost">#camera-system</span></div>
-                            <div><span class="ghost">#detector1</span></div>
-                            <div><span class="ghost">#detector2</span></div>
-                            <div><span class="ghost">#eic</span></div>
-                            <div><span class="ghost">#electronics-external</span></div>
-                            <div><span class="ghost">#gestion-grosses-batteries</span></div>
-                            <div><span class="ghost">#grimaud-renew-upsell</span></div>
-                            <div><span class="ghost">#install-st-tropez</span></div>
-                            <div><span class="ghost">#ivizzia-improvements</span></div>
-                            <div><span class="ghost">#orga-salons</span></div>
-                            <div><span class="ghost">#run-hubspot</span></div>
-                            <div><span class="ghost">#sentinel-incident-manager</span></div>
-                            <div><span class="ghost">#software-operation-notif</span></div>
-                            <div><span class="ghost">#test-app_automation</span></div>
-                            <div><span class="ghost">#v4-pcb</span></div>
-                            <div><span class="ghost">#web-dev</span></div>
+                
+                <div class="action-item">
+                    <div class="action-header" onclick="toggle(this)">
+                        <div class="action-left">
+                            <div class="action-dot warning"></div>
+                            <span class="action-name">Archive dead channels</span>
                         </div>
-                        
-                        <div class="list-label">💀 Dead channels — 90+ days inactive</div>
-                        <div class="channel-list">
-                            <div><span>#onboarding-project</span><span class="days">593d</span></div>
-                            <div><span>#v4_2-improvements</span><span class="days">446d</span></div>
-                            <div><span>#fabrication</span><span class="days">396d</span></div>
-                            <div><span>#sales-compta-signaturedevis</span><span class="days">354d</span></div>
-                            <div><span>#amendes</span><span class="days">302d</span></div>
-                            <div><span>#installations-v4</span><span class="days">285d</span></div>
-                            <div><span>#testautomatisation</span><span class="days">279d</span></div>
-                            <div><span>#saint-etienne</span><span class="days">269d</span></div>
-                            <div><span>#temporaire-aytré</span><span class="days">247d</span></div>
-                            <div><span>#demande-pref</span><span class="days">245d</span></div>
-                            <div><span>#csm-0churn-upsell</span><span class="days">243d</span></div>
-                            <div><span>#condom</span><span class="days">240d</span></div>
-                            <div><span>#projet-ccvam</span><span class="days">226d</span></div>
-                            <div><span>#gabin-webdesign</span><span class="days">223d</span></div>
-                            <div><span>#proj-proposition-amélioration</span><span class="days">218d</span></div>
-                            <div><span>#choisy-le-roi</span><span class="days">214d</span></div>
-                            <div><span>#réglementation-csu-fr</span><span class="days">211d</span></div>
-                            <div><span>#installation-draveil</span><span class="days">211d</span></div>
-                            <div><span>#reglages-cameras</span><span class="days">202d</span></div>
-                            <div><span>#media-labeling-testing</span><span class="days">199d</span></div>
-                            <div><span>#avignon-panneau-solaire</span><span class="days">197d</span></div>
-                            <div><span>#projet-vernon</span><span class="days">197d</span></div>
-                            <div><span>#résolution-incidents</span><span class="days">193d</span></div>
-                            <div><span>#new-client</span><span class="days">191d</span></div>
-                            <div><span>#depart-fx</span><span class="days">186d</span></div>
-                            <div><span>#website-updates-2025</span><span class="days">186d</span></div>
-                            <div><span>#temporaire-poc-panneaux-solaires</span><span class="days">184d</span></div>
-                            <div><span>#anagram-vizzia</span><span class="days">159d</span></div>
-                            <div><span>#notion-sales-and-onboarding</span><span class="days">157d</span></div>
-                            <div><span>#recyclage-batteries</span><span class="days">150d</span></div>
-                            <div><span>#packaging</span><span class="days">145d</span></div>
-                            <div><span>#sète</span><span class="days">106d</span></div>
-                            <div><span>#aytré</span><span class="days">102d</span></div>
-                            <div><span>#marketing</span><span class="days">102d</span></div>
-                            <div><span>#installations-réparations</span><span class="days">100d</span></div>
-                            <div><span>#new-installation</span><span class="days">96d</span></div>
-                            <div><span>#retool-apps</span><span class="days">93d</span></div>
+                        <div class="action-right">
+                            <div class="action-stat warning">55 channels</div>
+                            <div class="action-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
                         </div>
                     </div>
+                    <div class="action-content">
+                        <div class="action-body">
+                            <p><strong>Why:</strong> Dead channels create confusion. People hesitate to post, then retreat to DMs.</p>
+                            
+                            <div class="list-label">🚫 Ghost channels — 0 messages ever</div>
+                            <div class="channel-list">
+                                <div><span class="ghost">#abm-marketing</span></div>
+                                <div><span class="ghost">#alternants</span></div>
+                                <div><span class="ghost">#camera-system</span></div>
+                                <div><span class="ghost">#detector1</span></div>
+                                <div><span class="ghost">#detector2</span></div>
+                                <div><span class="ghost">#eic</span></div>
+                                <div><span class="ghost">#electronics-external</span></div>
+                                <div><span class="ghost">#gestion-grosses-batteries</span></div>
+                            </div>
+                            
+                            <div class="list-label">💀 Dead channels — 90+ days inactive</div>
+                            <div class="channel-list">
+                                <div><span>#onboarding-project</span><span class="days">593d</span></div>
+                                <div><span>#v4_2-improvements</span><span class="days">446d</span></div>
+                                <div><span>#fabrication</span><span class="days">396d</span></div>
+                                <div><span>#sales-compta-signaturedevis</span><span class="days">354d</span></div>
+                                <div><span>#amendes</span><span class="days">302d</span></div>
+                                <div><span>#installations-v4</span><span class="days">285d</span></div>
+                                <div><span>#marketing</span><span class="days">102d</span></div>
+                                <div><span>#retool-apps</span><span class="days">93d</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-item">
+                    <div class="action-header" onclick="toggle(this)">
+                        <div class="action-left">
+                            <div class="action-dot caution"></div>
+                            <span class="action-name">Standardize channel names</span>
+                        </div>
+                        <div class="action-right">
+                            <div class="action-stat caution">45 channels</div>
+                            <div class="action-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-body">
+                            <p><strong>Why:</strong> Without prefixes, you can't browse by category or spot temporary channels.</p>
+                            <p><strong>Required prefixes:</strong></p>
+                            <div class="prefixes">
+                                <span class="prefix">team-</span>
+                                <span class="prefix">proj-</span>
+                                <span class="prefix">help-</span>
+                                <span class="prefix">alert-</span>
+                                <span class="prefix">social-</span>
+                                <span class="prefix">ext-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-item">
+                    <div class="action-header" onclick="toggle(this)">
+                        <div class="action-left">
+                            <div class="action-dot caution"></div>
+                            <span class="action-name">Add channel descriptions</span>
+                        </div>
+                        <div class="action-right">
+                            <div class="action-stat caution">184 missing</div>
+                            <div class="action-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-body">
+                            <p><strong>Why:</strong> New hires can't understand what channels are for without descriptions.</p>
+                            <p><strong>Do:</strong> Each description should answer: <strong>What</strong> (purpose), <strong>Who</strong> (audience), <strong>When</strong> (response time).</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Best Practices -->
+            <div class="section-title">Best Practices</div>
+            
+            <div class="practices-emphasis">
+                <div class="practice emphasis">
+                    <div class="practice-icon">🧵</div>
+                    <div class="practice-title">Reply in threads</div>
+                    <div class="practice-desc">Keeps main channel readable and easy to follow at scale</div>
+                </div>
+                <div class="practice emphasis">
+                    <div class="practice-icon">👍</div>
+                    <div class="practice-title">React, don't reply</div>
+                    <div class="practice-desc">Emoji reactions reduce noise by 60% — use them liberally</div>
                 </div>
             </div>
             
-            <!-- 3. Naming standards -->
-            <div class="action-item">
-                <div class="action-header" onclick="toggle(this)">
-                    <div class="action-left">
-                        <div class="action-dot caution"></div>
-                        <span class="action-name">Standardize channel names</span>
-                    </div>
-                    <div class="action-right">
-                        <div class="action-stat caution">45 channels</div>
-                        <div class="action-chevron">
-                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                        </div>
-                    </div>
+            <div class="practices-secondary">
+                <div class="practice">
+                    <div class="practice-icon">📅</div>
+                    <div class="practice-title">Connect Calendar</div>
+                    <div class="practice-desc">Auto-sets meeting status</div>
                 </div>
-                <div class="action-content">
-                    <div class="action-body">
-                        <p><strong>Why:</strong> Without prefixes, you can't browse by category or spot temporary channels.</p>
-                        <p><strong>Required prefixes:</strong></p>
-                        <div class="prefixes">
-                            <span class="prefix">team-</span>
-                            <span class="prefix">proj-</span>
-                            <span class="prefix">help-</span>
-                            <span class="prefix">alert-</span>
-                            <span class="prefix">social-</span>
-                            <span class="prefix">ext-</span>
-                        </div>
-                    </div>
+                <div class="practice">
+                    <div class="practice-icon">💬</div>
+                    <div class="practice-title">Default to channels</div>
+                    <div class="practice-desc">DMs for private only</div>
+                </div>
+                <div class="practice">
+                    <div class="practice-icon">🔕</div>
+                    <div class="practice-title">@channel sparingly</div>
+                    <div class="practice-desc">Emergencies only</div>
+                </div>
+                <div class="practice">
+                    <div class="practice-icon">📌</div>
+                    <div class="practice-title">Pin key messages</div>
+                    <div class="practice-desc">Decisions & links</div>
                 </div>
             </div>
             
-            <!-- 4. Lowest priority: Descriptions -->
-            <div class="action-item">
-                <div class="action-header" onclick="toggle(this)">
-                    <div class="action-left">
-                        <div class="action-dot caution"></div>
-                        <span class="action-name">Add channel descriptions</span>
-                    </div>
-                    <div class="action-right">
-                        <div class="action-stat caution">184 missing</div>
-                        <div class="action-chevron">
-                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="action-content">
-                    <div class="action-body">
-                        <p><strong>Why:</strong> New hires can't understand what channels are for without descriptions.</p>
-                        <p><strong>Do:</strong> Each description should answer: <strong>What</strong> (purpose), <strong>Who</strong> (audience), <strong>When</strong> (response time).</p>
-                    </div>
-                </div>
+            <!-- Resources -->
+            <div class="section-title">Resources</div>
+            <div class="resources">
+                <a href="https://www.notion.so/vizzia/How-to-become-a-Slack-Hero-2e745c4b899e80bc904bd1880cebc5d6" target="_blank" class="resource-link">
+                    <span class="resource-icon">📘</span>
+                    <span class="resource-text">How to become a Slack Hero</span>
+                </a>
+                <a href="https://www.notion.so/vizzia/How-to-name-a-new-Slack-channel-2e745c4b899e80038d67d93760f29717" target="_blank" class="resource-link">
+                    <span class="resource-icon">📝</span>
+                    <span class="resource-text">How to name a new Slack channel</span>
+                </a>
             </div>
-            
         </div>
         
-        <!-- Best Practices -->
-        <div class="section-title">Best Practices</div>
-        
-        <!-- 2 Emphasized -->
-        <div class="practices-emphasis">
-            <div class="practice emphasis">
-                <div class="practice-icon">🧵</div>
-                <div class="practice-title">Reply in threads</div>
-                <div class="practice-desc">Keeps main channel readable and easy to follow at scale</div>
+        <!-- NOTION TAB -->
+        <div id="notion-tab" class="tab-content">
+            <!-- Top Section -->
+            <div class="top-section">
+                <div class="rating-card">
+                    <div class="rating-label">Workspace Health</div>
+                    <div class="stars">
+                        <span class="star filled">★</span>
+                        <span class="star filled">★</span>
+                        <span class="star half">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                    <div class="health-items">
+                        <div class="health-item">
+                            <span class="health-emoji">🔴</span>
+                            <span>Low page ownership</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-emoji">🟠</span>
+                            <span>Unclear page titles</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-emoji">🟡</span>
+                            <span>Freeform-heavy structure</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insights-card">
+                    <div class="insights-title">Key Insights</div>
+                    <div class="insight-item">
+                        <div class="insight-icon">👤</div>
+                        <div class="insight-text"><strong>Only ~30% of pages have explicit owners</strong> — docs lose relevance without accountability</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">📛</div>
+                        <div class="insight-text"><strong>~45% of page titles are unclear</strong> — generic names like "Process", "Documentation", "Template"</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">📄</div>
+                        <div class="insight-text"><strong>⅔ of pages are freeform</strong> — not indexed in databases, hard to search and filter</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">🔁</div>
+                        <div class="insight-text"><strong>56+ pages with duplicate names</strong> — <span class="highlight">"Meeting Notes"</span> appears <span class="highlight">10+ times</span></div>
+                    </div>
+                </div>
             </div>
-            <div class="practice emphasis">
-                <div class="practice-icon">👍</div>
-                <div class="practice-title">React, don't reply</div>
-                <div class="practice-desc">Emoji reactions reduce noise by 60% — use them liberally</div>
+            
+            <!-- Actions -->
+            <div class="section-title">Actions</div>
+            <div class="actions">
+                
+                <div class="action-item">
+                    <div class="action-header" onclick="toggle(this)">
+                        <div class="action-left">
+                            <div class="action-dot warning"></div>
+                            <span class="action-name">Add Owner property to databases</span>
+                        </div>
+                        <div class="action-right">
+                            <div class="action-stat warning">~70% missing</div>
+                            <div class="action-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-body">
+                            <p><strong>Why:</strong> Pages without owners become stale. No one knows who to ask, no one maintains them.</p>
+                            
+                            <div class="list-label">📦 Databases needing Owner property</div>
+                            <div class="channel-list">
+                                <div><span>Meeting Notes</span><span class="count">multiple DBs</span></div>
+                                <div><span>AI meeting notes</span><span class="count">no owner</span></div>
+                                <div><span>Rétro</span><span class="count">has Assignation only</span></div>
+                                <div><span>Process databases</span><span class="count">various</span></div>
+                                <div><span>Documentation pages</span><span class="count">~60-80 pages</span></div>
+                            </div>
+                            
+                            <p style="margin-top: 14px;"><strong>Do:</strong> Add "Owner" (person) and "Last reviewed" (date) properties to all key databases.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-item">
+                    <div class="action-header" onclick="toggle(this)">
+                        <div class="action-left">
+                            <div class="action-dot caution"></div>
+                            <span class="action-name">Consolidate duplicate pages</span>
+                        </div>
+                        <div class="action-right">
+                            <div class="action-stat caution">56+ duplicates</div>
+                            <div class="action-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-body">
+                            <p><strong>Why:</strong> Duplicates cause confusion. People create new pages instead of finding existing ones.</p>
+                            
+                            <div class="list-label">🔁 Worst offenders — duplicate page names</div>
+                            <div class="channel-list">
+                                <div><span>Meeting Notes</span><span class="count">10+ copies</span></div>
+                                <div><span>[Template] - Offre</span><span class="count">7+ copies</span></div>
+                                <div><span>Archives</span><span class="count">7+ copies</span></div>
+                                <div><span>Roadmap</span><span class="count">8+ copies</span></div>
+                                <div><span>Objectives</span><span class="count">5+ copies</span></div>
+                                <div><span>Process</span><span class="count">5+ copies</span></div>
+                                <div><span>Documentation</span><span class="count">5+ copies</span></div>
+                                <div><span>Template</span><span class="count">4+ copies</span></div>
+                            </div>
+                            
+                            <p style="margin-top: 14px;"><strong>Do:</strong> Merge into single sources of truth. Use linked database views for team-specific needs.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-item">
+                    <div class="action-header" onclick="toggle(this)">
+                        <div class="action-left">
+                            <div class="action-dot caution"></div>
+                            <span class="action-name">Rename generic pages</span>
+                        </div>
+                        <div class="action-right">
+                            <div class="action-stat caution">~45% unclear</div>
+                            <div class="action-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-content">
+                        <div class="action-body">
+                            <p><strong>Why:</strong> Generic names hurt searchability. "Process" tells you nothing — whose process? For what?</p>
+                            <p><strong>Use this format:</strong></p>
+                            <div class="prefixes">
+                                <span class="prefix">Team • Topic</span>
+                                <span class="prefix">Topic • Type</span>
+                                <span class="prefix">Product • Detail</span>
+                            </div>
+                            <p style="margin-top: 14px;"><strong>Examples:</strong></p>
+                            <p>❌ "Process" → ✅ "Sales Recruitment Process"</p>
+                            <p>❌ "Roadmap" → ✅ "Roadmap Q1 2026 - Safety Product"</p>
+                            <p>❌ "Camera V2" → ✅ "Camera V2 – Power Architecture"</p>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
-        </div>
-        
-        <!-- 4 Secondary -->
-        <div class="practices-secondary">
-            <div class="practice">
-                <div class="practice-icon">📅</div>
-                <div class="practice-title">Connect Calendar</div>
-                <div class="practice-desc">Auto-sets meeting status</div>
+            
+            <!-- Best Practices -->
+            <div class="section-title">Best Practices</div>
+            
+            <div class="practices-emphasis">
+                <div class="practice emphasis">
+                    <div class="practice-icon">📝</div>
+                    <div class="practice-title">Use descriptive titles</div>
+                    <div class="practice-desc">Format: Team • Topic • Type — makes search actually work</div>
+                </div>
+                <div class="practice emphasis">
+                    <div class="practice-icon">✂️</div>
+                    <div class="practice-title">Keep pages short</div>
+                    <div class="practice-desc">One concept per page. If scrolling is needed, split into sub-pages</div>
+                </div>
             </div>
-            <div class="practice">
-                <div class="practice-icon">💬</div>
-                <div class="practice-title">Default to channels</div>
-                <div class="practice-desc">DMs for private only</div>
+            
+            <div class="practices-secondary">
+                <div class="practice">
+                    <div class="practice-icon">👤</div>
+                    <div class="practice-title">Assign owners</div>
+                    <div class="practice-desc">Every DB needs an Owner</div>
+                </div>
+                <div class="practice">
+                    <div class="practice-icon">🗃️</div>
+                    <div class="practice-title">Use databases</div>
+                    <div class="practice-desc">Repeatable data, not freeform</div>
+                </div>
+                <div class="practice">
+                    <div class="practice-icon">📅</div>
+                    <div class="practice-title">Add review dates</div>
+                    <div class="practice-desc">Last reviewed + by whom</div>
+                </div>
+                <div class="practice">
+                    <div class="practice-icon">🗑️</div>
+                    <div class="practice-title">Archive stale content</div>
+                    <div class="practice-desc">Quarterly cleanup</div>
+                </div>
             </div>
-            <div class="practice">
-                <div class="practice-icon">🔕</div>
-                <div class="practice-title">@channel sparingly</div>
-                <div class="practice-desc">Emergencies only</div>
+            
+            <!-- Resources -->
+            <div class="section-title">Resources</div>
+            <div class="resources">
+                <a href="https://www.notion.so/vizzia/How-to-create-well-organized-Notion-pages-2e745c4b899e808784d8d34177406714" target="_blank" class="resource-link">
+                    <span class="resource-icon">📘</span>
+                    <span class="resource-text">How to create well-organized Notion pages</span>
+                </a>
+                <a href="https://www.notion.so/vizzia/Using-Slack-Notion-and-Drive-2e745c4b899e80c5872dd80c613e9947" target="_blank" class="resource-link">
+                    <span class="resource-icon">🔗</span>
+                    <span class="resource-text">Using Slack, Notion and Drive</span>
+                </a>
             </div>
-            <div class="practice">
-                <div class="practice-icon">📌</div>
-                <div class="practice-title">Pin key messages</div>
-                <div class="practice-desc">Decisions & links</div>
-            </div>
-        </div>
-        
-        <!-- Resources -->
-        <div class="section-title">Resources</div>
-        <div class="resources">
-            <a href="https://www.notion.so/vizzia/How-to-become-a-Slack-Hero-2e745c4b899e80bc904bd1880cebc5d6" target="_blank" class="resource-link">
-                <span class="resource-icon">📘</span>
-                <span class="resource-text">How to become a Slack Hero</span>
-            </a>
-            <a href="https://www.notion.so/vizzia/How-to-name-a-new-Slack-channel-2e745c4b899e80038d67d93760f29717" target="_blank" class="resource-link">
-                <span class="resource-icon">📝</span>
-                <span class="resource-text">How to name a new Slack channel</span>
-            </a>
         </div>
     </div>
     
     <script>
         function toggle(el) {
             el.closest('.action-item').classList.toggle('open');
+        }
+        
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.closest('.tab').classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
         }
     </script>
 </body>
